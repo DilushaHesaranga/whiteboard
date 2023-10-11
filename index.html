@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Whiteboard</title>
+    <style>
+        #whiteboard {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label>Pen Color: </label>
+        <input type="color" id="colorPicker">
+        <button id="pen">Pen</button>
+        <button id="pencil">Pencil</button>
+        <button id="eraser">Eraser</button>
+    </div>
+    <canvas id="whiteboard" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('whiteboard');
+        const context = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const penButton = document.getElementById('pen');
+        const pencilButton = document.getElementById('pencil');
+        const eraserButton = document.getElementById('eraser');
+
+        let drawing = false;
+        let tool = 'pen';
+        let currentColor = colorPicker.value;
+        let lineWidth = 2;
+
+        canvas.addEventListener('mousedown', () => {
+            drawing = true;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+            context.beginPath();
+        });
+
+        canvas.addEventListener('mousemove', draw);
+
+        colorPicker.addEventListener('input', () => {
+            currentColor = colorPicker.value;
+        });
+
+        penButton.addEventListener('click', () => {
+            tool = 'pen';
+            context.lineWidth = lineWidth;
+        });
+
+        pencilButton.addEventListener('click', () => {
+            tool = 'pencil';
+            context.lineWidth = 1;
+        });
+
+        eraserButton.addEventListener('click', () => {
+            tool = 'eraser';
+            context.lineWidth = 10;
+        });
+
+        function draw(event) {
+            if (!drawing) return;
+
+            context.strokeStyle = currentColor;
+            context.lineJoin = 'round';
+            context.lineCap = 'round';
+
+            context.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+            context.stroke();
+
+            if (tool === 'pen' || tool === 'pencil') {
+                context.beginPath();
+                context.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+            } else if (tool === 'eraser') {
+                context.clearRect(
+                    event.clientX - canvas.offsetLeft - lineWidth / 2,
+                    event.clientY - canvas.offsetTop - lineWidth / 2,
+                    lineWidth,
+                    lineWidth
+                );
+            }
+        }
+    </script>
+</body>
+</html>
